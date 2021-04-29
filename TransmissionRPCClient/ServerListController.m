@@ -12,7 +12,6 @@
 #import "TorrentListController.h"
 #import "StatusListController.h"
 #import "RPCServerConfigDB.h"
-#import "ServerListFooterView.h"
 #import "GlobalConsts.h"
 
 @interface ServerListController () <ServerListItemCellDelegate>
@@ -31,8 +30,6 @@
     StatusListController *_statusListController;
     
     NSString        *_version;
-    
-    ServerListFooterView *_footerView;
 }
 
 - (void)viewDidLoad
@@ -192,42 +189,6 @@
     [self.navigationController pushViewController:self.rpcConfigController animated:YES];
 }
 
-- (void)showVersion:(NSString *)version
-{
-   if( version )
-   {
-       if( !_footerView )
-           _footerView = [ServerListFooterView view];
-       
-       _footerView.labelVersion.text = version;
-       self.tableView.tableFooterView = _footerView;
-   }
-   else
-   {
-       self.tableView.tableFooterView = nil;
-   }
-}
-
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
-    [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
-    
-    if( self.tableView.tableFooterView )
-    {
-        [_footerView setBoundsFromTableView:self.tableView];
-        self.tableView.tableFooterView = _footerView;
-        
-        if( self.splitViewController )
-        {
-            UINavigationController *nav = self.splitViewController.viewControllers[1];
-            TorrentListController *tlc = nav.viewControllers[0];
-            
-            tlc.items = nil;
-            tlc.infoMessage = NSLocalizedString( @"There is no selected server.", @"" );
-        }
-    }
-}
-
 #pragma mark - TableView delegate methods
 
 // handler for selecting server with config
@@ -267,10 +228,6 @@
 
     self.navigationItem.leftBarButtonItem.enabled = itemsCount > 0;
     self.infoMessage = itemsCount > 0 ? nil :  NSLocalizedString(@"There are no servers available add server to the list", nil);
-    
-    // show version if there is some server items
-    //self.footerInfoMessage = itemsCount > 0 ?  [_version : nil;
-    [self showVersion:(itemsCount > 0 ? _version : nil )];
     
     return itemsCount > 0 ? 1 : 0;
  }
